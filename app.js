@@ -1,43 +1,45 @@
-navigator.mediaDevices.getUserMedia ||
-  navigator.webkitGetUserMedia ||
-  navigator.mozGetUserMedia;
+// app.js
+navigator.mediaDevices.getUserMedia =
+    navigator.mediaDevices.getUserMedia ||
+    navigator.webkitGetUserMedia ||
+    navigator.mozGetUserMedia;
 
 function bindEvents(p) {
     p.on('error', function (error) {
-        console.log('Peer connection error:', error);
+        console.log('Erreur de connexion pair à pair :', error);
     });
 
     p.on('signal', function (data) {
-        console.log('Generated signal:', data);
+        console.log('Signal généré :', data);
         document.getElementById('offer').textContent = JSON.stringify(data);
     });
 
     p.on('stream', function (stream) {
-        console.log('Received stream:', stream);
+        console.log('Flux reçu :', stream);
         let video = document.getElementById('receiver-video');
         if (video) {
             video.srcObject = stream;
             video.play();
-            console.log('Receiver video set and playing.');
+            console.log('Vidéo du récepteur configurée et en lecture.');
         }
     });
 
     document.getElementById('incoming').addEventListener('submit', function (e) {
         e.preventDefault();
-        let signalData = e.target.querySelector('textarea').value;
-        console.log('Received incoming signal data:', signalData);
+        let signalData = document.getElementById('incoming').querySelector('textarea').value;
+        console.log('Données de signal entrant reçues :', signalData);
         p.signal(JSON.parse(signalData));
     });
 }
 
 function startPeer(initiator) {
-    console.log('Starting peer connection. Initiator:', initiator);
+    console.log('Démarrage de la connexion pair à pair. Initiateur :', initiator);
     navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true
     })
     .then(function (stream) {
-        console.log('Media stream obtained:', stream);
+        console.log('Flux multimédia obtenu :', stream);
         let p;
         try {
             p = new SimplePeer({
@@ -51,7 +53,7 @@ function startPeer(initiator) {
                 }
             });
         } catch (peerError) {
-            console.log('Error creating SimplePeer:', peerError);
+            console.log('Erreur lors de la création de SimplePeer :', peerError);
             // Gérer l'erreur ici
             return;
         }
@@ -60,17 +62,17 @@ function startPeer(initiator) {
         if (emitterVideo) {
             emitterVideo.srcObject = stream;
             emitterVideo.play();
-            console.log('Emitter video set and playing.');
+            console.log('Vidéo de l\'émetteur configurée et en lecture.');
         }
 
         // Attendre que l'offre soit générée
         p.on('signal', function (data) {
-            console.log('Offer signal:', data);
+            console.log('Signal d\'offre :', data);
             document.getElementById('offer').textContent = JSON.stringify(data);
         });
     })
     .catch(function (error) {
-        console.log('Error accessing media devices:', error);
+        console.log('Erreur lors de l\'accès aux périphériques multimédias :', error);
     });
 }
 
@@ -81,6 +83,7 @@ document.getElementById('start').addEventListener('click', function (e) {
 document.getElementById('receive').addEventListener('click', function (e) {
     startPeer(false);
 });
+
 
 
 /////////////////////////////////////////////////////////////////////////////////
