@@ -48,7 +48,7 @@ function startPeer(initiator) {
                 trickle: false,
                 config: {
                     iceServers: [
-                        { urls: 'stun:stun.l.google.com:19302'' }
+                        { urls: 'stun:stun.l.google.com:19302' }
                     ]
                 }
             });
